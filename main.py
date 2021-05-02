@@ -4,7 +4,6 @@ import os
 import io
 from info_json import TableInfo
 
-
 class TelegramBot():
   def __init__(self):
     token ='1768676380:AAHpCcROVoPNv3Mtw5axQG1rv3oHGP65qas'
@@ -37,41 +36,44 @@ class TelegramBot():
   def criar_resposta(self,mensagem, eh_primeira_msg, chat_id):
     
     mensagem = mensagem['message']['text']
-    if eh_primeira_msg == True or mensagem.lower() == 'Ajuda':
-      return f'''Olá bem vindo a Pokedex em Portugues.{os.linesep}Digite o numero da pokedex do Pokemon ou o nome para saber mais informações sobre ele :)'''
-
-    #Buscar pokemon buscado
-    link_default ="https://db.pokemongohub.net/images/official/full/"
-    link_shiny = "https://db.pokemongohub.net/images/ingame/normal/pokemon_icon_"
-    pokedex, nome = self.buscar_pokemon(mensagem.lower())
-
-    url = f'{self.url_base}sendPhoto';
-    #Enviando imagem do pokemon normal
-    remote_image = requests.get(f'''{link_default}{pokedex}.webp''')
-    photo = io.BytesIO(remote_image.content)
-    photo.name = "pokemon"
-    files = {'photo': photo}
-    data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} '''}
-    r1 = requests.post(url, files=files, data=data)
-    #Enviando imagem do pokemon shiny
-    remote_image = requests.get(f'''{link_shiny}{pokedex}_00_shiny.png''')
-    photo = io.BytesIO(remote_image.content)
-    photo.name = "pokemon"
-    files = {'photo': photo}
-    data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} - Shiny '''}
-    r2 = requests.post(url, files=files, data=data)
-    #Tratando respostas de erro ao usuário
-    if r1.status_code == 200 or r2.status_code == 200:
-      resposta = ''
+    print(mensagem)
+    if eh_primeira_msg == True or mensagem.lower() in ['ajuda', '/start']:
+      resposta = f'''Olá bem vindo ao PokeInfo bot em Portugues.{os.linesep}Digite o número da pokedex ou nome do Pokemon para saber mais informações sobre ele :)'''
+      print(resposta)
     else:
-      resposta = 'Pokemon não encontrado, tente novamente!'  
-    #print(r1.status_code)
+        
+      #Buscar pokemon buscado
+      link_default ="https://db.pokemongohub.net/images/official/full/"
+      link_shiny = "https://db.pokemongohub.net/images/ingame/normal/pokemon_icon_"
+      pokedex, nome = self.buscar_pokemon(mensagem.lower())
 
-    print(r1.status_code, r1.reason, r1.content)  
-    print(r2.status_code, r2.reason, r2.content)
-    #files = {'photo': open('pokemon_1.png', 'rb')}
-    #msg = self.url_base
-    #foto = requests.post(msg, files= files)
+      url = f'{self.url_base}sendPhoto';
+      #Enviando imagem do pokemon normal
+      remote_image = requests.get(f'''{link_default}{pokedex}.webp''')
+      photo = io.BytesIO(remote_image.content)
+      photo.name = "pokemon"
+      files = {'photo': photo}
+      data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} '''}
+      r1 = requests.post(url, files=files, data=data)
+      #Enviando imagem do pokemon shiny
+      remote_image = requests.get(f'''{link_shiny}{pokedex}_00_shiny.png''')
+      photo = io.BytesIO(remote_image.content)
+      photo.name = "pokemon"
+      files = {'photo': photo}
+      data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} - Shiny '''}
+      r2 = requests.post(url, files=files, data=data)
+      #Tratando respostas de erro ao usuário
+      print(r1)
+      print(r2)
+      if r1.status_code == 200 or r2.status_code == 200:
+        resposta = ''
+      else:
+        resposta = 'Pokemon não encontrado, tente novamente!'  
+      #print(r1.status_code)
+        print(resposta)
+    #print(r1.status_code, r1.reason, r1.content)  
+    #print(r2.status_code, r2.reason, r2.content)
+
     return resposta     
 
 
