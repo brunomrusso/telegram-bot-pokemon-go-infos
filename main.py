@@ -86,27 +86,48 @@ class TelegramBot():
 
   def responder(self, resposta, chat_id):
     #enviar a mensagem
-    link_de_envio = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}'
+    link_de_envio = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}&parse_mode=html'
     requests.get(link_de_envio)
 
   def montar_quadro_stats(self, num_dex):
 
       http = f'https://pokemon.gameinfo.io/pt-br/pokemon/{num_dex}'
       r = requests.get(http)
-      #r = requests.get('https://finance.yahoo.com/quote/FB?p=FB')
-      soup = bs4.BeautifulSoup(r.text, "lxml")
-      #print(soup)
+      soup = bs4.BeautifulSoup(r.text, "lxml")      
+      quadro_resposta = self.montar_string_resposta(soup)
+      return quadro_resposta
+
+  def montar_string_resposta(self, soup):
+      
+      #Lista com todas as variaveis de resposta
       resposta = []
+
       #Ataque #1
       resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[2].text)
       #Defesa #2
       resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[5].text)
       #Stamina #3
       resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[8].text)
+      #Sobre o pokemon
+      resposta.append(soup.find('p', {'class': 'description'}).text)
+      #Tipo do pokemon
+      tipagens = soup.find_all('div', {'class': 'large-type'})
+      tipos = []
+      for tipo in tipagens:
+        tipos.append(tipo.text)
+      #Loop de tipagem  
+      for i in range(len(tipos)):
+        print(i)
+        if i == 0:
+          tipagem = tipos[i]
+        else:
+          tipagem = f'{tipagem},{tipos[i]}'
 
-      quadro = f'Atributos Base{os.linesep}Ataque   -> {resposta[0]}{os.linesep}Defesa   -> {resposta[1]}{os.linesep}Stamina -> {resposta[2]}'
+      quadro_resposta = f'<b><u>SOBRE</u></b>{os.linesep}{resposta[3]}{os.linesep}<b><u>TIPAGEM</u></b>{os.linesep}{tipagem}{os.linesep}<b><u>ATRIBUTOS BASE</u></b>{os.linesep}{os.linesep}ATAQUE   -> {resposta[0]}{os.linesep}DEFESA   -> {resposta[1]}{os.linesep}STAMINA -> {resposta[2]}'
       #print(quadro)
-      return quadro
+      return quadro_resposta
+
+
 
   def buscar_pokemon(self, palavra, pokedex=None, nome=None):
 
