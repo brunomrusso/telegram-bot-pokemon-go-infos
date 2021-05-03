@@ -1,12 +1,17 @@
+"""
+Criado por Bruno Marinez Russo
+Abril/2021
+"""
 import requests
 import json
 import os
 import io
+import bs4
 from info_json import TableInfo
 
 class TelegramBot():
   def __init__(self):
-    token ='1768676380:AAHpCcROVoPNv3Mtw5axQG1rv3oHGP65qas'
+    token ='1796285888:AAEKwKlrqOkYDoP3sdS_O0YeeZSRcOEX8hw'
     self.url_base = f'https://api.telegram.org/bot{token}/'
     self.info_json = TableInfo()
 
@@ -38,7 +43,7 @@ class TelegramBot():
     mensagem = mensagem['message']['text']
     print(mensagem)
     if eh_primeira_msg == True or mensagem.lower() in ['ajuda', '/start']:
-      resposta = f'''Olá bem vindo ao PokeInfo bot em Portugues.{os.linesep}Digite o número da pokedex ou nome do Pokemon para saber mais informações sobre ele :)'''
+      resposta = f'''Olá bem vindo ao PokeInfo bot em Português.{os.linesep}Digite o número da pokedex ou nome do Pokemon para saber mais informações sobre ele :){os.linesep}Fonte: pokemongohub.net'''
       print(resposta)
     else:
         
@@ -55,6 +60,7 @@ class TelegramBot():
       files = {'photo': photo}
       data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} '''}
       r1 = requests.post(url, files=files, data=data)
+
       #Enviando imagem do pokemon shiny
       remote_image = requests.get(f'''{link_shiny}{pokedex}_00_shiny.png''')
       photo = io.BytesIO(remote_image.content)
@@ -65,6 +71,10 @@ class TelegramBot():
       #Tratando respostas de erro ao usuário
       print(r1)
       print(r2)
+
+      montar_quadro_stats()
+
+
       if r1.status_code == 200 or r2.status_code == 200:
         resposta = ''
       else:
@@ -81,6 +91,18 @@ class TelegramBot():
     #enviar a mensagem
     link_de_envio = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}'
     requests.get(link_de_envio)
+
+  def montar_quadro_stats(self, num_dex):
+
+      http = f'https://pokemon.gameinfo.io/pt-br/pokemon/{num_dex}'
+      r = requests.get(http)
+      #r = requests.get('https://finance.yahoo.com/quote/FB?p=FB')
+      soup = bs4.BeautifulSoup(r.text, "lxml")
+      #print(soup)
+      teste = soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[2].text
+      #teste = soup.find_all('div',{'class':'My(6px) Pos(r) smartphone_Mt(6px)'})[0].find('span').text
+      print(teste)
+      #print(teste[1])
 
   def buscar_pokemon(self, palavra, pokedex=None, nome=None):
 
