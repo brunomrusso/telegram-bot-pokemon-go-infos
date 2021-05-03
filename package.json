@@ -4,11 +4,10 @@
   "version": "0.2.8",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src",
+    "start": "node index.js",
     "lint": "eslint .",
     "test": "npm run lint",
-    "prepublishOnly": "npm test",
-    "start": "node index"
+    "prepublishOnly": "npm test"
   },
   "author": "Bannerets <save14@protonmail.com>",
   "license": "MIT",
