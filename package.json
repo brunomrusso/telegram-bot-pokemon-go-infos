@@ -1,36 +1,34 @@
 {
-  "name": "TelegramBotTeste",
-  "description": "Now you can write Telegram bots in HTML.",
-  "scripts": {
-    "start": "node index.js",
-    "lint": "eslint .",
-    "test": "npm run lint",
-    "prepublishOnly": "npm test"
-  },
-  "author": "Bruno Martinez Russo <brunopiuu4@hotmail.com>"
-  },
-{
-  "directories": {
-    "example": "examples"
-  },
-  "keywords": [
-    "telegram",
-    "telegram-bot",
-    "telegram-bot-api",
-    "telegram bot",
-    "telegram bot api",
-    "bot",
-    "bot-api",
-    "bot api",
-    "tg",
-    "html"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/brunomrusso/TelegramBotTeste/edit/pokego_bot.git"
-  },
-  "bugs": {
-    "url": "https://github.com/brunomrusso/TelegramBotTeste/edit/pokego_bot/issues"
-  },
-  "homepage": "https://github.com/brunomrusso/TelegramBotTeste/edit/pokego_bot#readme"
+	"name": "TelegramBotTeste",
+	"description": "Now you can write Telegram bots in HTML.",
+	"scripts": {
+		"start": "node index.js",
+		"lint": "eslint .",
+		"test": "npm run lint",
+		"prepublishOnly": "npm test"
+	},
+	"author": "Bruno Martinez Russo <brunopiuu4@hotmail.com>",
+	"directories": {
+		"example": "examples"
+	},
+	"keywords": [
+		"telegram",
+		"telegram-bot",
+		"telegram-bot-api",
+		"telegram bot",
+		"telegram bot api",
+		"bot",
+		"bot-api",
+		"bot api",
+		"tg",
+		"html"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/brunomrusso/TelegramBotTeste/edit/pokego_bot.git"
+	},
+	"bugs": {
+		"url": "https://github.com/brunomrusso/TelegramBotTeste/edit/pokego_bot/issues"
+	},
+	"homepage": "https://github.com/brunomrusso/TelegramBotTeste/edit/pokego_bot#readme"
 }
