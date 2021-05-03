@@ -2,7 +2,7 @@
 	"name": "TelegramBotTeste",
 	"description": "Now you can write Telegram bots in HTML.",
 	"scripts": {
-		"start": "node index.js",
+		"start": "node main.py",
 		"lint": "eslint .",
 		"test": "npm run lint",
 		"prepublishOnly": "npm test"
