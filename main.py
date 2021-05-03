@@ -7,7 +7,7 @@ import json
 import os
 import io
 import bs4
-from info_json import TableInfo
+from table.info_json import TableInfo
 
 class TelegramBot():
   def __init__(self):
@@ -72,11 +72,8 @@ class TelegramBot():
       print(r1)
       print(r2)
 
-      montar_quadro_stats()
-
-
       if r1.status_code == 200 or r2.status_code == 200:
-        resposta = ''
+        resposta = self.montar_quadro_stats(pokedex)
       else:
         resposta = 'Pokemon não encontrado, tente novamente!'  
       #print(r1.status_code)
@@ -99,10 +96,17 @@ class TelegramBot():
       #r = requests.get('https://finance.yahoo.com/quote/FB?p=FB')
       soup = bs4.BeautifulSoup(r.text, "lxml")
       #print(soup)
-      teste = soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[2].text
-      #teste = soup.find_all('div',{'class':'My(6px) Pos(r) smartphone_Mt(6px)'})[0].find('span').text
-      print(teste)
-      #print(teste[1])
+      resposta = []
+      #Ataque #1
+      resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[2].text)
+      #Defesa #2
+      resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[5].text)
+      #Stamina #3
+      resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[8].text)
+
+      quadro = f'Atributos Base{os.linesep}Ataque   -> {resposta[0]}{os.linesep}Defesa   -> {resposta[1]}{os.linesep}Stamina -> {resposta[2]}'
+      #print(quadro)
+      return quadro
 
   def buscar_pokemon(self, palavra, pokedex=None, nome=None):
 

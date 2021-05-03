@@ -1,0 +1,1 @@
+Usar a planilha montar_json.xlsx para atualizar a classe info_json.py, qualquer novo insert na planilha é só copiar a formula da coluna C para as novas linhas (nunca apagar a primeira nem a ultima linha, elas começam e terminam o json), copiar e colar no bloco de notas, em seguida copiar e colar no info_json.py no metodo json_dados
