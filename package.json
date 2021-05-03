@@ -7,7 +7,8 @@
     "start": "node src",
     "lint": "eslint .",
     "test": "npm run lint",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm test",
+    "start": "node index"
   },
   "author": "Bannerets <save14@protonmail.com>",
   "license": "MIT",
