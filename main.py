@@ -1,5 +1,5 @@
 """
-Criado por Bruno Marinez Russo
+Criado por Bruno Martinez Russo
 Abril/2021
 """
 import requests
@@ -7,22 +7,23 @@ import json
 import os
 import io
 import bs4
+#Classes utulizadas
 from table.info_json import TableInfo
 
 class TelegramBot():
   def __init__(self):
-    token ='1796285888:AAEKwKlrqOkYDoP3sdS_O0YeeZSRcOEX8hw'
-    self.url_base = f'https://api.telegram.org/bot{token}/'
+    __token ='1796285888:AAEKwKlrqOkYDoP3sdS_O0YeeZSRcOEX8hw'
+    self.url_base = f'https://api.telegram.org/bot{__token}/'
     self.info_json = TableInfo()
 
   #iniciar Bot
   def Iniciar(self):
     update_id = None
     while True:
-      atualizacao = self.obter_mensagens(update_id)
-      mensagens = atualizacao['result']
-      if mensagens:
-        for mensagem in mensagens:
+      __atualizacao = self.obter_mensagens(update_id)
+      __mensagens = __atualizacao['result']
+      if __mensagens:
+        for mensagem in __mensagens:
           update_id = mensagem['update_id']
           chat_id = mensagem['message']['from']['id']
           eh_primeira_msg = mensagem['message']['message_id'] == 1
@@ -48,26 +49,26 @@ class TelegramBot():
     else:
         
       #Buscar pokemon buscado
-      link_default ="https://db.pokemongohub.net/images/official/full/"
-      link_shiny = "https://db.pokemongohub.net/images/ingame/normal/pokemon_icon_"
+      __link_default ="https://db.pokemongohub.net/images/official/full/"
+      __link_shiny = "https://db.pokemongohub.net/images/ingame/normal/pokemon_icon_"
       pokedex, nome = self.buscar_pokemon(mensagem.lower())
 
-      url = f'{self.url_base}sendPhoto';
+      __url = f'{self.url_base}sendPhoto';
       #Enviando imagem do pokemon normal
-      remote_image = requests.get(f'''{link_default}{pokedex}.webp''')
+      remote_image = requests.get(f'''{__link_default}{pokedex}.webp''')
       photo = io.BytesIO(remote_image.content)
       photo.name = "pokemon"
       files = {'photo': photo}
       data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} '''}
-      r1 = requests.post(url, files=files, data=data)
+      r1 = requests.post(__url, files=files, data=data)
 
       #Enviando imagem do pokemon shiny
-      remote_image = requests.get(f'''{link_shiny}{pokedex}_00_shiny.png''')
+      remote_image = requests.get(f'''{__link_shiny}{pokedex}_00_shiny.png''')
       photo = io.BytesIO(remote_image.content)
       photo.name = "pokemon"
       files = {'photo': photo}
       data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} - Shiny '''}
-      r2 = requests.post(url, files=files, data=data)
+      r2 = requests.post(__url, files=files, data=data)
       #Tratando respostas de erro ao usuário
       print(r1)
       print(r2)
@@ -91,10 +92,10 @@ class TelegramBot():
 
   def montar_quadro_stats(self, num_dex):
 
-      http = f'https://pokemon.gameinfo.io/pt-br/pokemon/{num_dex}'
-      r = requests.get(http)
-      soup = bs4.BeautifulSoup(r.text, "lxml")      
-      quadro_resposta = self.montar_string_resposta(soup)
+      __http = f'https://pokemon.gameinfo.io/pt-br/pokemon/{num_dex}'
+      __r = requests.get(__http)
+      __soup = bs4.BeautifulSoup(__r.text, "lxml")      
+      quadro_resposta = self.montar_string_resposta(__soup)
       return quadro_resposta
 
   def montar_string_resposta(self, soup):
