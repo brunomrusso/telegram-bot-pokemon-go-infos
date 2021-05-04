@@ -7,6 +7,7 @@ import json
 import os
 import io
 import bs4
+import re
 #Classes utulizadas
 from table.info_json import TableInfo
 
@@ -120,14 +121,43 @@ class TelegramBot():
             tipagem = tipos[i]
           else:
             tipagem = f'{tipagem},{tipos[i]}'
+      #Vulneravel a:
+      vulnerabilidades = soup.find_all('table', {'class': 'weaknesses weak'})[0].find_all('td')
+      lst_vul = []
+      for vul in vulnerabilidades:
+        texto = vul.text
+        lst_vul.append(texto.replace('\n', '').replace('\t', ''))
+      vulneravel = ''  
+      for i in range(len(lst_vul)):  
+        if i % 2 == 0:
+          vulneravel = vulneravel + lst_vul[i]
+        else:
+          vulneravel = vulneravel + ' ' + lst_vul[i] + '\n'  
 
-        quadro_resposta = f'<b><u>SOBRE</u></b>{os.linesep}{resposta[3]}{os.linesep}<b><u>TIPAGEM</u></b>{os.linesep}{tipagem}{os.linesep}<b><u>ATRIBUTOS BASE</u></b>{os.linesep}{os.linesep}ATAQUE   -> {resposta[0]}{os.linesep}DEFESA   -> {resposta[1]}{os.linesep}STAMINA -> {resposta[2]}'
-        #print(quadro)
-      except:
-        quadro_resposta = 'Informações sobre esse pokemon ainda não disponiveis.'
-        
+       #Resistente a:
+      resistencias = soup.find_all('table', {'class': 'weaknesses res'})[0].find_all('td')
+      lst_res = []
+      for res in resistencias:
+        texto = res.text
+        lst_res.append(texto.replace('\n', '').replace('\t', ''))
+      resiste = ''  
+      for i in range(len(lst_res)):  
+        if i % 2 == 0:
+          resiste = resiste + lst_res[i]
+        else:
+          resiste = resiste + ' ' + lst_res[i] + '\n'          
+
+
+      quadro_resposta = f'<b><u>SOBRE</u></b>{os.linesep}{resposta[3]}{os.linesep}<b><u>TIPAGEM</u></b>{os.linesep}{tipagem}{os.linesep}<b><u>VULNERAVEL A</u></b>{os.linesep}{os.linesep}{vulneravel}{os.linesep}<b><u>RESISTENTE A</u></b>{os.linesep}{os.linesep}{resiste}{os.linesep}<b><u>ATRIBUTOS BASE</u></b>{os.linesep}{os.linesep}ATAQUE   -> {resposta[0]}{os.linesep}DEFESA   -> {resposta[1]}{os.linesep}STAMINA -> {resposta[2]}'
+      #print(quadro)
+
+      quadro_resposta = self.traduzir_palavras(quadro_resposta)
       return quadro_resposta
 
+  def traduzir_palavras(self, texto):
+    rep_dict = {'deals':'causa', 'damage':'dano', 'Water':'Água', 'Grass':'Grama', 'Electric':'Elétrico', 'Steel':'Aço', 'Fire':'Fogo', 'Ice':'Gelo', 'Fairy':'Fada', 'Poison':'Venenoso', 'Dark':'Sombrio', 'Bug':'Inseto', 'Dragon':'Dragão', 'Flying':'Voador', 'Ground':'Terrestre', 'Rock':'Pedra', 'Fighting':'Lutador', 'Psychic':'Psiquico', 'Ghost':'Fantasma'}
+    pattern = re.compile("|".join([re.escape(k) for k in sorted(rep_dict,key=len,reverse=True)]), flags=re.DOTALL)
+    return pattern.sub(lambda x: rep_dict[x.group(0)], texto)
 
 
   def buscar_pokemon(self, palavra, pokedex=None, nome=None):
