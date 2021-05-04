@@ -1,6 +1,4 @@
 requests==2.21.0
 requests-oauthlib==1.0.0
 bs4==0.0.1
-json
-os
-io
+lxml==4.6.3
