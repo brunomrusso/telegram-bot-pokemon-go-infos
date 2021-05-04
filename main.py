@@ -17,7 +17,7 @@ class TelegramBot():
     self.info_json = TableInfo()
 
   #iniciar Bot
-  def Iniciar(self):
+  def main(self):
     update_id = None
     while True:
       __atualizacao = self.obter_mensagens(update_id)
@@ -150,13 +150,8 @@ class TelegramBot():
               if x["items"][row]['busca'][i].lower().find(palavra) != -1:
                 pokedex = x["items"][row]['pokedex']
                 nome = x["items"][row]['busca'][1]
-    return pokedex, nome       
+    return pokedex, nome
 
-bot = TelegramBot()
-bot.Iniciar()    
-
-
-
-
-    
+if __name__ == '__main__':
+    TelegramBot().main()
 
