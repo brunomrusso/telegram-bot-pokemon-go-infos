@@ -99,30 +99,33 @@ class TelegramBot():
       
       #Lista com todas as variaveis de resposta
       resposta = []
+      try:
+        #Ataque #1
+        resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[2].text)
+        #Defesa #2
+        resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[5].text)
+        #Stamina #3
+        resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[8].text)
+        #Sobre o pokemon
+        resposta.append(soup.find('p', {'class': 'description'}).text)
+        #Tipo do pokemon
+        tipagens = soup.find_all('div', {'class': 'large-type'})
+        tipos = []
+        for tipo in tipagens:
+          tipos.append(tipo.text)
+        #Loop de tipagem  
+        for i in range(len(tipos)):
+          print(i)
+          if i == 0:
+            tipagem = tipos[i]
+          else:
+            tipagem = f'{tipagem},{tipos[i]}'
 
-      #Ataque #1
-      resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[2].text)
-      #Defesa #2
-      resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[5].text)
-      #Stamina #3
-      resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[8].text)
-      #Sobre o pokemon
-      resposta.append(soup.find('p', {'class': 'description'}).text)
-      #Tipo do pokemon
-      tipagens = soup.find_all('div', {'class': 'large-type'})
-      tipos = []
-      for tipo in tipagens:
-        tipos.append(tipo.text)
-      #Loop de tipagem  
-      for i in range(len(tipos)):
-        print(i)
-        if i == 0:
-          tipagem = tipos[i]
-        else:
-          tipagem = f'{tipagem},{tipos[i]}'
-
-      quadro_resposta = f'<b><u>SOBRE</u></b>{os.linesep}{resposta[3]}{os.linesep}<b><u>TIPAGEM</u></b>{os.linesep}{tipagem}{os.linesep}<b><u>ATRIBUTOS BASE</u></b>{os.linesep}{os.linesep}ATAQUE   -> {resposta[0]}{os.linesep}DEFESA   -> {resposta[1]}{os.linesep}STAMINA -> {resposta[2]}'
-      #print(quadro)
+        quadro_resposta = f'<b><u>SOBRE</u></b>{os.linesep}{resposta[3]}{os.linesep}<b><u>TIPAGEM</u></b>{os.linesep}{tipagem}{os.linesep}<b><u>ATRIBUTOS BASE</u></b>{os.linesep}{os.linesep}ATAQUE   -> {resposta[0]}{os.linesep}DEFESA   -> {resposta[1]}{os.linesep}STAMINA -> {resposta[2]}'
+        #print(quadro)
+      except:
+        quadro_resposta = 'Informações sobre esse pokemon ainda não disponiveis.'
+        
       return quadro_resposta
 
 
