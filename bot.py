@@ -53,7 +53,7 @@ class TelegramBot():
       __link_shiny = "https://db.pokemongohub.net/images/ingame/normal/pokemon_icon_"
       pokedex, nome = self.buscar_pokemon(mensagem.lower())
 
-      __url = f'{self.url_base}sendPhoto';
+      url = f'{self.url_base}sendPhoto';
       #Enviando imagem do pokemon normal
       r1 = self.montar_imagem(f'''{__link_default}{pokedex}.webp''', f'''{pokedex} - {nome} ''', chat_id, url)
       #Enviando imagem do pokemon shiny
