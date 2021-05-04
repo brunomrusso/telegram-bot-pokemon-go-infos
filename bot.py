@@ -12,8 +12,10 @@ from table.info_json import TableInfo
 
 class TelegramBot():
   def __init__(self):
-    __token ='1796285888:AAEKwKlrqOkYDoP3sdS_O0YeeZSRcOEX8hw'
-    self.url_base = f'https://api.telegram.org/bot{__token}/'
+    TOKEN = os.environ['TOKEN']
+    print(os.environ['TOKEN'])
+    #__token ='1796285888:AAEKwKlrqOkYDoP3sdS_O0YeeZSRcOEX8hw'
+    self.url_base = f'https://api.telegram.org/bot{TOKEN}/'
     self.info_json = TableInfo()
 
   #iniciar Bot
