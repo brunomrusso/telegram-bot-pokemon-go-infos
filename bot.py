@@ -13,8 +13,6 @@ from table.info_json import TableInfo
 class TelegramBot():
   def __init__(self):
     TOKEN = os.environ['TOKEN']
-    print(os.environ['TOKEN'])
-    #__token ='1796285888:AAEKwKlrqOkYDoP3sdS_O0YeeZSRcOEX8hw'
     self.url_base = f'https://api.telegram.org/bot{TOKEN}/'
     self.info_json = TableInfo()
 
@@ -57,35 +55,32 @@ class TelegramBot():
 
       __url = f'{self.url_base}sendPhoto';
       #Enviando imagem do pokemon normal
-      remote_image = requests.get(f'''{__link_default}{pokedex}.webp''')
-      photo = io.BytesIO(remote_image.content)
-      photo.name = "pokemon"
-      files = {'photo': photo}
-      data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} '''}
-      r1 = requests.post(__url, files=files, data=data)
-
+      r1 = self.montar_imagem(f'''{__link_default}{pokedex}.webp''', f'''{pokedex} - {nome} ''', chat_id, url)
       #Enviando imagem do pokemon shiny
-      remote_image = requests.get(f'''{__link_shiny}{pokedex}_00_shiny.png''')
-      photo = io.BytesIO(remote_image.content)
-      photo.name = "pokemon"
-      files = {'photo': photo}
-      data = {'chat_id' : chat_id, 'caption':  f'''{pokedex} - {nome} - Shiny '''}
-      r2 = requests.post(__url, files=files, data=data)
+      r2 = self.montar_imagem(f'''{__link_shiny}{pokedex}_00_shiny.png''', f'''{pokedex} - {nome} - Shiny ''', chat_id, url)
+      
       #Tratando respostas de erro ao usuário
-      print(r1)
-      print(r2)
-
       if r1.status_code == 200 or r2.status_code == 200:
         resposta = self.montar_quadro_stats(pokedex)
       else:
         resposta = 'Pokemon não encontrado, tente novamente!'  
       #print(r1.status_code)
         print(resposta)
-    #print(r1.status_code, r1.reason, r1.content)  
-    #print(r2.status_code, r2.reason, r2.content)
+    print(r1.status_code, r1.reason, r1.content)  
+    print(r2.status_code, r2.reason, r2.content)
 
-    return resposta     
-
+    return resposta
+  
+  def montar_imagem(self, link, caption, chat_id, url):
+    
+      remote_image = requests.get(link)
+      photo = io.BytesIO(remote_image.content)
+      photo.name = "pokemon"
+      files = {'photo': photo}
+      data = {'chat_id' : chat_id, 'caption':  caption}
+      r = requests.post(url, files=files, data=data)
+      print(r)
+      return r 
 
   def responder(self, resposta, chat_id):
     #enviar a mensagem
