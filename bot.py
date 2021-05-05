@@ -7,9 +7,9 @@ import json
 import os
 import io
 import bs4
-import re
 #Classes utulizadas
 from table.info_json import TableInfo
+from functions.quadro_resposta import Quadro
 
 class TelegramBot():
   def __init__(self):
@@ -25,10 +25,10 @@ class TelegramBot():
       __mensagens = __atualizacao['result']
       if __mensagens:
         for mensagem in __mensagens:
-          update_id = mensagem['update_id']
-          chat_id = mensagem['message']['from']['id']
-          eh_primeira_msg = mensagem['message']['message_id'] == 1
           try:
+            update_id = mensagem['update_id']
+            chat_id = mensagem['message']['from']['id']
+            eh_primeira_msg = mensagem['message']['message_id'] == 1
             resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
             self.responder(resposta, chat_id)
           except:
@@ -87,83 +87,17 @@ class TelegramBot():
       return r 
 
   def responder(self, resposta, chat_id):
-    #enviar a mensagem
-    link_de_envio = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}&parse_mode=html'
-    requests.get(link_de_envio)
+      #enviar a mensagem
+      link_de_envio = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}&parse_mode=html'
+      requests.get(link_de_envio)
 
   def montar_quadro_stats(self, num_dex):
 
       __http = f'https://pokemon.gameinfo.io/pt-br/pokemon/{num_dex}'
       __r = requests.get(__http)
       __soup = bs4.BeautifulSoup(__r.text, "lxml")      
-      quadro_resposta = self.montar_string_resposta(__soup)
+      quadro_resposta = quadro.montar_string_resposta(__soup)
       return quadro_resposta
-
-  def montar_string_resposta(self, soup):
-      
-      #Lista com todas as variaveis de resposta
-      resposta = []
-      try:
-        #Ataque #1
-        resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[2].text)
-        #Defesa #2
-        resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[5].text)
-        #Stamina #3
-        resposta.append(soup.find_all('div', {'class': 'togglable'})[1].find_all('td')[8].text)
-        #Sobre o pokemon
-        resposta.append(soup.find('p', {'class': 'description'}).text)
-        #Tipo do pokemon
-        tipagens = soup.find_all('div', {'class': 'large-type'})
-        tipos = []
-        for tipo in tipagens:
-          tipos.append(tipo.text)
-        #Loop de tipagem  
-        for i in range(len(tipos)):
-          print(i)
-          if i == 0:
-            tipagem = tipos[i]
-          else:
-            tipagem = f'{tipagem},{tipos[i]}'
-        #Vulneravel a:
-        vulnerabilidades = soup.find_all('table', {'class': 'weaknesses weak'})[0].find_all('td')
-        lst_vul = []
-        for vul in vulnerabilidades:
-          texto = vul.text
-          lst_vul.append(texto.replace('\n', '').replace('\t', ''))
-        vulneravel = ''  
-        for i in range(len(lst_vul)):  
-          if i % 2 == 0:
-            vulneravel = vulneravel + lst_vul[i]
-          else:
-            vulneravel = vulneravel + ' ' + lst_vul[i] + '\n'  
-
-         #Resistente a:
-        resistencias = soup.find_all('table', {'class': 'weaknesses res'})[0].find_all('td')
-        lst_res = []
-        for res in resistencias:
-          texto = res.text
-          lst_res.append(texto.replace('\n', '').replace('\t', ''))
-        resiste = ''  
-        for i in range(len(lst_res)):  
-          if i % 2 == 0:
-            resiste = resiste + lst_res[i]
-          else:
-            resiste = resiste + ' ' + lst_res[i] + '\n'          
-
-
-        quadro_resposta = f'<b><u>SOBRE</u></b>{os.linesep}{resposta[3]}{os.linesep}<b><u>TIPAGEM</u></b>{os.linesep}{tipagem}{os.linesep}<b><u>VULNERAVEL A</u></b>{os.linesep}{os.linesep}{vulneravel}{os.linesep}<b><u>RESISTENTE A</u></b>{os.linesep}{os.linesep}{resiste}{os.linesep}<b><u>ATRIBUTOS BASE</u></b>{os.linesep}{os.linesep}ATAQUE   -> {resposta[0]}{os.linesep}DEFESA   -> {resposta[1]}{os.linesep}STAMINA -> {resposta[2]}'
-        #print(quadro)
-
-        quadro_resposta = self.traduzir_palavras(quadro_resposta)
-      except:
-        quadro_resposta = 'Informações não disponiveis para esse Pokemon.'
-      return quadro_resposta
-
-  def traduzir_palavras(self, texto):
-    rep_dict = {'deals':'causa', 'damage':'dano', 'Water':'Água', 'Grass':'Grama', 'Electric':'Elétrico', 'Steel':'Aço', 'Fire':'Fogo', 'Ice':'Gelo', 'Fairy':'Fada', 'Poison':'Venenoso', 'Dark':'Sombrio', 'Bug':'Inseto', 'Dragon':'Dragão', 'Flying':'Voador', 'Ground':'Terrestre', 'Rock':'Pedra', 'Fighting':'Lutador', 'Psychic':'Psiquico', 'Ghost':'Fantasma'}
-    pattern = re.compile("|".join([re.escape(k) for k in sorted(rep_dict,key=len,reverse=True)]), flags=re.DOTALL)
-    return pattern.sub(lambda x: rep_dict[x.group(0)], texto)
-
 
   def buscar_pokemon(self, palavra, pokedex=None, nome=None):
 
