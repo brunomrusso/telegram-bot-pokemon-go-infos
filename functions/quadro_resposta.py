@@ -13,7 +13,7 @@ class Quadro():
         vulneravel = self.vulnerabilidade(soup)
         resiste = self.resistencia(soup)      
 
-        quadro_resposta = f'<b><u>SOBRE</u></b>{os.linesep}{stats[3]}{os.linesep}<b><u>TIPAGEM</u></b>{os.linesep}{tipagem}{os.linesep}<b><u>VULNERAVEL A</u></b>{os.linesep}{os.linesep}{vulneravel}{os.linesep}<b><u>RESISTENTE A</u></b>{os.linesep}{os.linesep}{resiste}{os.linesep}<b><u>ATRIBUTOS BASE</u></b>{os.linesep}{os.linesep}ATAQUE   -> {stats[0]}{os.linesep}DEFESA   -> {stats[1]}{os.linesep}STAMINA -> {stats[2]}'
+        quadro_resposta = f'<b><u>SOBRE</u></b>{os.linesep}{stats[3]}{os.linesep}<b><u>TIPAGEM</u></b>{os.linesep}{tipagem}{os.linesep}<b><u>VULNERAVEL A</u></b>{os.linesep}{os.linesep}{vulneravel}{os.linesep}<b><u>RESISTENTE A</u></b>{os.linesep}{os.linesep}{resiste}{os.linesep}<b><u>ATRIBUTOS BASE</u></b>{os.linesep}{os.linesep}ATAQUE   -> <b>{stats[0]}</b>{os.linesep}DEFESA   -> <b>{stats[1]}</b>{os.linesep}STAMINA -> <b>{stats[2]}</b>'
         #print(quadro)
 
         quadro_resposta = traducao.traduzir_palavras(quadro_resposta)
