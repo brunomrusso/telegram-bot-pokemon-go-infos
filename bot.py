@@ -33,7 +33,7 @@ class TelegramBot():
 
  #Obter mensagens
   def obter_mensagens(self, update_id):
-    link_requisicao = f'{self.url_base}getUpdates?timeout=100'
+    link_requisicao = f'{self.url_base}getUpdates?timeout=500'
     if update_id:
       link_requisicao = f'{link_requisicao}&offset={update_id + 1}'
     resultado = requests.get(link_requisicao)
