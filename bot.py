@@ -28,8 +28,11 @@ class TelegramBot():
           update_id = mensagem['update_id']
           chat_id = mensagem['message']['from']['id']
           eh_primeira_msg = mensagem['message']['message_id'] == 1
-          resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
-          self.responder(resposta, chat_id)
+          try:
+            resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
+            self.responder(resposta, chat_id)
+          except:
+            print("Aconteceu algo errado :(")
 
  #Obter mensagens
   def obter_mensagens(self, update_id):
