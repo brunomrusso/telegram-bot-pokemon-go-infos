@@ -93,6 +93,7 @@ class TelegramBot():
 
   def montar_quadro_stats(self, num_dex):
 
+      quadro = Quadro()
       __http = f'https://pokemon.gameinfo.io/pt-br/pokemon/{num_dex}'
       __r = requests.get(__http)
       __soup = bs4.BeautifulSoup(__r.text, "lxml")      
