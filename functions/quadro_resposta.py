@@ -64,7 +64,7 @@ class Quadro():
       vulneravel = ''  
       for i in range(len(lst_vul)):  
         if i % 2 == 0:
-          vulneravel = vulneravel + '<b>' + lst_vul[i] + </b>
+          vulneravel = vulneravel + '<b>' + lst_vul[i] + '</b>'
         else:
           vulneravel = vulneravel + ' ' + lst_vul[i] + '\n'
 
@@ -81,7 +81,7 @@ class Quadro():
       resiste = ''  
       for i in range(len(lst_res)):  
         if i % 2 == 0:
-          resiste = resiste + '<b>' + lst_res[i] + </b>
+          resiste = resiste + '<b>' + lst_res[i] + '</b>'
         else:
           resiste = resiste + ' ' + lst_res[i] + '\n'
 
