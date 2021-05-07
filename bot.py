@@ -70,7 +70,7 @@ class TelegramBot():
         resposta = 'Pokemon não encontrado, tente novamente!'  
       print(r1.status_code, r1.reason, r1.content)  
       print(r2.status_code, r2.reason, r2.content)
-    print(resposta)
+    #print(resposta)
     return resposta
   
   def montar_imagem(self, link, caption, chat_id, url):
