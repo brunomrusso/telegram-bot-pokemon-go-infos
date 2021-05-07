@@ -21,18 +21,18 @@ class TelegramBot():
   def main(self):
     update_id = None
     while True:
-      __atualizacao = self.obter_mensagens(update_id)
-      __mensagens = __atualizacao['result']
-      if __mensagens:
-        for mensagem in __mensagens:
-          try:
-            update_id = mensagem['update_id']
-            chat_id = mensagem['message']['from']['id']
-            eh_primeira_msg = mensagem['message']['message_id'] == 1
-            resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
-            self.responder(resposta, chat_id)
-          except:
-            print("Aconteceu algo errado :(")
+      try:
+        __atualizacao = self.obter_mensagens(update_id)
+        __mensagens = __atualizacao['result']
+        if __mensagens:
+          for mensagem in __mensagens:
+              update_id = mensagem['update_id']
+              chat_id = mensagem['message']['from']['id']
+              eh_primeira_msg = mensagem['message']['message_id'] == 1
+              resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
+              self.responder(resposta, chat_id)
+      except:
+        print("Aconteceu algo errado :(")
 
  #Obter mensagens
   def obter_mensagens(self, update_id):
