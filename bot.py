@@ -21,20 +21,18 @@ class TelegramBot():
   def main(self):
     update_id = None
     while True:
-      __atualizacao = self.obter_mensagens(update_id)
-      __mensagens = __atualizacao['result']
-      print(__mensagens)
-      if __mensagens:
-        for mensagem in __mensagens:
-          try:
-            update_id = mensagem['update_id']
-            chat_id = mensagem['message']['from']['id']
-            eh_primeira_msg = mensagem['message']['message_id'] == 1
-            resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
-            print(resposta)
-            self.responder(resposta, chat_id)
-          except:
-            print("Aconteceu algo errado :(")
+      try:
+        __atualizacao = self.obter_mensagens(update_id)
+        __mensagens = __atualizacao['result']
+        if __mensagens:
+          for mensagem in __mensagens:
+              update_id = mensagem['update_id']
+              chat_id = mensagem['message']['from']['id']
+              eh_primeira_msg = mensagem['message']['message_id'] == 1
+              resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
+              self.responder(resposta, chat_id)
+      except:
+        print("Aconteceu algo errado :(")
 
  #Obter mensagens
   def obter_mensagens(self, update_id):
@@ -49,9 +47,9 @@ class TelegramBot():
     
     mensagem = mensagem['message']['text']
     print(mensagem)
-    if eh_primeira_msg == True or mensagem.lower() in ['ajuda', '/start']:
+    if eh_primeira_msg == True or mensagem.lower() in ['ajuda', '/start', 'help']:
       resposta = f'''Olá bem vindo ao PokeInfo bot em Português.{os.linesep}Digite o número da pokedex ou nome do Pokemon para saber mais informações sobre ele :){os.linesep}Fonte: pokemongohub.net'''
-      #print(resposta)
+
     else:
         
       #Buscar pokemon buscado
@@ -70,11 +68,9 @@ class TelegramBot():
         resposta = self.montar_quadro_stats(pokedex)
       else:
         resposta = 'Pokemon não encontrado, tente novamente!'  
-      #print(r1.status_code)
-        #print(resposta)
-    print(r1.status_code, r1.reason, r1.content)  
-    print(r2.status_code, r2.reason, r2.content)
-
+      print(r1.status_code, r1.reason, r1.content)  
+      print(r2.status_code, r2.reason, r2.content)
+    print(resposta)
     return resposta
   
   def montar_imagem(self, link, caption, chat_id, url):
