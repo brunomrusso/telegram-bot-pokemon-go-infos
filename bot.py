@@ -61,7 +61,7 @@ class TelegramBot():
       #Enviando imagem do pokemon normal
       r1 = self.montar_imagem(f'''{__link_default}{pokedex}.webp''', f'''{pokedex} - {nome} ''', chat_id, url)
       #Enviando imagem do pokemon shiny
-      r2 = self.montar_imagem(f'''{__link_shiny}{pokedex}_00_shiny.png''', f'''{pokedex} - {nome} - Shiny \xE2\x9C\x82 ''', chat_id, url)
+      r2 = self.montar_imagem(f'''{__link_shiny}{pokedex}_00_shiny.png''', f'''{pokedex} - {nome} - Shiny u'\U0001F604' ''', chat_id, url)
       
       #Tratando respostas de erro ao usuário
       if r1.status_code == 200 or r2.status_code == 200:
