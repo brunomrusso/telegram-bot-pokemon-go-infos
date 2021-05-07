@@ -23,6 +23,7 @@ class TelegramBot():
     while True:
       __atualizacao = self.obter_mensagens(update_id)
       __mensagens = __atualizacao['result']
+      print(__mensagens)
       if __mensagens:
         for mensagem in __mensagens:
           try:
