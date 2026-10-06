@@ -1,5 +1,4 @@
-import os
-from intro_to_flask import app
+from bot import TelegramBot
 
-port = int(os.environ.get("PORT", 3002))
-app.run(debug=True, host='0.0.0.0', port=port)
+if __name__ == "__main__":
+    TelegramBot().main()

@@ -1,126 +1,129 @@
 """
 Criado por Bruno Martinez Russo
-Abril/2021
+Abril/2021 | Refatorado em Outubro/2026
 """
-import requests
 import json
 import os
-import io
-import bs4
-#Classes utulizadas
-from table.info_json import TableInfo
+import requests
+
 from functions.quadro_resposta import Quadro
+from table.info_json import TableInfo
 
-class TelegramBot():
-  def __init__(self):
-    TOKEN = os.environ['TOKEN']
-    self.url_base = f'https://api.telegram.org/bot{TOKEN}/'
-    self.info_json = TableInfo()
 
-  #iniciar Bot
-  def main(self):
-    update_id = None
-    while True:
-      try:
-        __atualizacao = self.obter_mensagens(update_id)
-        __mensagens = __atualizacao['result']
-        if __mensagens:
-          for mensagem in __mensagens:
-              update_id = mensagem['update_id']
-              chat_id = mensagem['message']['from']['id']
-              eh_primeira_msg = mensagem['message']['message_id'] == 1
-              resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
-              self.responder(resposta, chat_id)
-      except:
-        print("Aconteceu algo errado :(")
+class TelegramBot:
+    def __init__(self):
+        self.token = os.environ.get("TOKEN")
+        if not self.token:
+            raise RuntimeError("Variável de ambiente TOKEN não configurada.")
 
- #Obter mensagens
-  def obter_mensagens(self, update_id):
-    link_requisicao = f'{self.url_base}getUpdates?timeout=400'
-    if update_id:
-      link_requisicao = f'{link_requisicao}&offset={update_id + 1}'
-    resultado = requests.get(link_requisicao)
-    return json.loads(resultado.content)
+        self.url_base = f"https://api.telegram.org/bot{self.token}/"
+        self.info_json = TableInfo()
+        self.quadro = Quadro()
 
-  #criando respostas para o usuario 
-  def criar_resposta(self,mensagem, eh_primeira_msg, chat_id):
-    
-    mensagem = mensagem['message']['text']
-    print(mensagem)
-    if eh_primeira_msg == True or mensagem.lower() in ['ajuda', '/start', 'help']:
-      resposta = f'''Olá bem vindo ao PokeInfo bot em Português.{os.linesep}Digite o número da pokedex ou nome do Pokemon para saber mais informações sobre ele :){os.linesep}Fonte: pokemongohub.net'''
+    def main(self):
+        update_id = None
+        print("Bot iniciado. Aguardando mensagens...")
+        while True:
+            try:
+                atualizacao = self.obter_mensagens(update_id)
+                mensagens = atualizacao.get("result", [])
+                if mensagens:
+                    for mensagem in mensagens:
+                        update_id = mensagem["update_id"]
+                        chat_id = mensagem["message"]["from"]["id"]
+                        eh_primeira_msg = mensagem["message"]["message_id"] == 1
+                        resposta = self.criar_resposta(mensagem, eh_primeira_msg, chat_id)
+                        self.responder(resposta, chat_id)
+            except Exception as exc:
+                print(f"Aconteceu algo errado: {exc}")
 
-    else:
-        
-      #Buscar pokemon buscado
-      __link_default ="https://db.pokemongohub.net/images/official/full/"
-      __link_shiny = "https://db.pokemongohub.net/images/ingame/normal/pokemon_icon_"
-      pokedex, nome = self.buscar_pokemon(mensagem.lower())
+    def obter_mensagens(self, update_id):
+        link_requisicao = f"{self.url_base}getUpdates?timeout=400"
+        if update_id:
+            link_requisicao = f"{link_requisicao}&offset={update_id + 1}"
+        resultado = requests.get(link_requisicao, timeout=60)
+        resultado.raise_for_status()
+        return resultado.json()
 
-      url = f'{self.url_base}sendPhoto';
-      #Enviando imagem do pokemon normal
-      r1 = self.montar_imagem(f'''{__link_default}{pokedex}.webp''', f'''{pokedex} - {nome} ''', chat_id, url)
-      #Enviando imagem do pokemon shiny
-      emoji = u'\U00002728'
-      r2 = self.montar_imagem(f'''{__link_shiny}{pokedex}_00_shiny.png''', f'''{pokedex} - {nome} - Shiny {emoji} ''', chat_id, url)
-      
-      #Tratando respostas de erro ao usuário
-      if r1.status_code == 200 or r2.status_code == 200:
-        resposta = self.montar_quadro_stats(pokedex)
-      else:
-        resposta = 'Pokemon não encontrado, tente novamente!'  
-      print(r1.status_code, r1.reason, r1.content)  
-      print(r2.status_code, r2.reason, r2.content)
-    #print(resposta)
-    return resposta
-  
-  def montar_imagem(self, link, caption, chat_id, url):
-    
-      remote_image = requests.get(link)
-      photo = io.BytesIO(remote_image.content)
-      photo.name = "pokemon"
-      files = {'photo': photo}
-      data = {'chat_id' : chat_id, 'caption':  caption}
-      r = requests.post(url, files=files, data=data)
-      print(r)
-      return r 
+    def criar_resposta(self, mensagem, eh_primeira_msg, chat_id):
+        texto = mensagem["message"].get("text", "")
+        print(f"Mensagem recebida: {texto}")
 
-  def responder(self, resposta, chat_id):
-      #enviar a mensagem
-      link_de_envio = f'{self.url_base}sendMessage?chat_id={chat_id}&text={resposta}&parse_mode=html'
-      requests.get(link_de_envio)
+        if eh_primeira_msg or texto.lower() in ["ajuda", "/start", "help"]:
+            return (
+                "Olá! Bem-vindo ao PokeInfo bot em Português.\n"
+                "Digite o número da Pokédex ou o nome do Pokémon (em inglês) "
+                "para saber mais informações sobre ele :)\n"
+                "Fonte: PokeAPI"
+            )
 
-  def montar_quadro_stats(self, num_dex):
+        termo = texto.lower().strip()
+        pokedex, nome = self.buscar_pokemon(termo)
 
-      quadro = Quadro()
-      __http = f'https://pokemon.gameinfo.io/pt-br/pokemon/{num_dex}'
-      __r = requests.get(__http)
-      __soup = bs4.BeautifulSoup(__r.text, "lxml")      
-      quadro_resposta = quadro.montar_string_resposta(__soup)
-      return quadro_resposta
+        # Se a tabela local não encontrou, tenta o termo digitado direto na PokeAPI.
+        identificador = nome.lower() if nome else termo
 
-  def buscar_pokemon(self, palavra, pokedex=None, nome=None):
+        pokemon, info_texto = self.quadro.montar_resposta(identificador)
 
-    #Buscar pokemon no json
-    x = self.info_json.json_dados(palavra)  
+        if pokemon is None:
+            return "Pokémon não encontrado, tente novamente!"
 
-    num_row = len(x["items"]) 
-    for row in range(num_row):
-        #print(x["items"][row]['busca'])
-        num_busca = len(x["items"][row]['busca'])
-        #Buscando o pokemon pela palavra/numero digitado elo usuario
-        for i in range(num_busca):
-            if x["items"][row]['busca'][i].lower() == palavra:
-                pokedex = x["items"][row]['pokedex']
-                nome = x["items"][row]['busca'][1]
-            #Quando ele não encontrar o pokemon na busca acima
-             #Ele tenta fazer uma busca pela subtring da palavra digitada    
-            if pokedex == None and i == 1:
-              if x["items"][row]['busca'][i].lower().find(palavra) != -1:
-                pokedex = x["items"][row]['pokedex']
-                nome = x["items"][row]['busca'][1]
-    return pokedex, nome
+        url_envio_foto = f"{self.url_base}sendPhoto"
+        self.enviar_foto(pokemon["sprite_normal"], f"{pokemon['id']} - {pokemon['name']}", chat_id, url_envio_foto)
 
-if __name__ == '__main__':
+        emoji = "\u2728"
+        self.enviar_foto(
+            pokemon["sprite_shiny"],
+            f"{pokemon['id']} - {pokemon['name']} - Shiny {emoji}",
+            chat_id,
+            url_envio_foto,
+        )
+
+        return info_texto
+
+    def enviar_foto(self, url_imagem, caption, chat_id, url):
+        if not url_imagem:
+            print("URL da imagem não disponível.")
+            return
+
+        payload = {"chat_id": chat_id, "photo": url_imagem, "caption": caption}
+        try:
+            response = requests.post(url, data=payload, timeout=60)
+            response.raise_for_status()
+            print(f"Foto enviada: {response.status_code}")
+        except requests.RequestException as exc:
+            print(f"Erro ao enviar foto: {exc}")
+
+    def responder(self, resposta, chat_id):
+        link_de_envio = (
+            f"{self.url_base}sendMessage"
+            f"?chat_id={chat_id}"
+            f"&text={requests.utils.quote(resposta)}"
+            f"&parse_mode=html"
+        )
+        try:
+            requests.get(link_de_envio, timeout=60)
+        except requests.RequestException as exc:
+            print(f"Erro ao enviar mensagem: {exc}")
+
+    def buscar_pokemon(self, palavra, pokedex=None, nome=None):
+        x = self.info_json.json_dados(palavra)
+
+        num_row = len(x["items"])
+        for row in range(num_row):
+            num_busca = len(x["items"][row]["busca"])
+            for i in range(num_busca):
+                if x["items"][row]["busca"][i].lower() == palavra:
+                    pokedex = x["items"][row]["pokedex"]
+                    nome = x["items"][row]["busca"][1]
+
+                if pokedex is None and i == 1:
+                    if palavra in x["items"][row]["busca"][i].lower():
+                        pokedex = x["items"][row]["pokedex"]
+                        nome = x["items"][row]["busca"][1]
+
+        return pokedex, nome
+
+
+if __name__ == "__main__":
     TelegramBot().main()
-
